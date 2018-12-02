@@ -1,0 +1,296 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssm.crud.dao.CommentMapper">
+  <resultMap id="BaseResultMap" type="com.ssm.crud.bean.Comment">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="a_id" jdbcType="INTEGER" property="aId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="commentTime" jdbcType="VARCHAR" property="commenttime" />
+    <result column="replyPerson" jdbcType="VARCHAR" property="replyperson" />
+    <result column="reply" jdbcType="VARCHAR" property="reply" />
+    <result column="replyTime" jdbcType="VARCHAR" property="replytime" />
+  </resultMap>
+  <resultMap id="BaseResultMapWithArticle" type="com.ssm.crud.bean.Comment">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="a_id" jdbcType="INTEGER" property="aId" />
+    <result column="name" jdbcType="VARCHAR" property="name" />
+    <result column="comment" jdbcType="VARCHAR" property="comment" />
+    <result column="commentTime" jdbcType="VARCHAR" property="commenttime" />
+    <result column="replyPerson" jdbcType="VARCHAR" property="replyperson" />
+    <result column="reply" jdbcType="VARCHAR" property="reply" />
+    <result column="replyTime" jdbcType="VARCHAR" property="replytime" />
+    <!-- 指定联合查询出的类别字段的封装 -->
+    <association property="article" javaType="com.ssm.crud.bean.Article">
+    	<id column="id" property="id"/>
+    	<result column="title" property="title"/>
+    </association>
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    id, a_id, name, comment, commentTime, replyPerson, reply, replyTime
+  </sql>
+  <sql id="Base_Column_List_WithArticle">
+    a.id, a.a_id, a.name, a.comment, a.commentTime, a.replyPerson, a.reply,a.replyTime,b.id,b.title
+  </sql>
+  <select id="selectByExample" parameterType="com.ssm.crud.bean.CommentExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from tb_comment
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByExampleWithArticle" parameterType="com.ssm.crud.bean.CommentExample" resultMap="BaseResultMapWithArticle">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List_WithArticle" />
+    from tb_comment a left join tb_article b on a.`a_id`=b.`id`
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from tb_comment
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="selectByPrimaryKeyWithArticle" parameterType="java.lang.Integer" resultMap="BaseResultMapWithArticle">
+    select 
+    <include refid="Base_Column_List_WithArticle" />
+    from tb_comment a left join tb_article b on a.`a_id`=b.`id`
+    where a.id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from tb_comment
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.ssm.crud.bean.CommentExample">
+    delete from tb_comment
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.ssm.crud.bean.Comment">
+    insert into tb_comment (id, a_id, name, 
+      comment, commentTime, replyPerson, 
+      reply, replyTime)
+    values (#{id,jdbcType=INTEGER}, #{aId,jdbcType=INTEGER}, #{name,jdbcType=VARCHAR}, 
+      #{comment,jdbcType=VARCHAR}, #{commenttime,jdbcType=VARCHAR}, #{replyperson,jdbcType=VARCHAR}, 
+      #{reply,jdbcType=VARCHAR}, #{replytime,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.ssm.crud.bean.Comment">
+    insert into tb_comment
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="aId != null">
+        a_id,
+      </if>
+      <if test="name != null">
+        name,
+      </if>
+      <if test="comment != null">
+        comment,
+      </if>
+      <if test="commenttime != null">
+        commentTime,
+      </if>
+      <if test="replyperson != null">
+        replyPerson,
+      </if>
+      <if test="reply != null">
+        reply,
+      </if>
+      <if test="replytime != null">
+        replyTime,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="aId != null">
+        #{aId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null">
+        #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="commenttime != null">
+        #{commenttime,jdbcType=VARCHAR},
+      </if>
+      <if test="replyperson != null">
+        #{replyperson,jdbcType=VARCHAR},
+      </if>
+      <if test="reply != null">
+        #{reply,jdbcType=VARCHAR},
+      </if>
+      <if test="replytime != null">
+        #{replytime,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.ssm.crud.bean.CommentExample" resultType="java.lang.Long">
+    select count(*) from tb_comment
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update tb_comment
+    <set>
+      <if test="record.id != null">
+        id = #{record.id,jdbcType=INTEGER},
+      </if>
+      <if test="record.aId != null">
+        a_id = #{record.aId,jdbcType=INTEGER},
+      </if>
+      <if test="record.name != null">
+        name = #{record.name,jdbcType=VARCHAR},
+      </if>
+      <if test="record.comment != null">
+        comment = #{record.comment,jdbcType=VARCHAR},
+      </if>
+      <if test="record.commenttime != null">
+        commentTime = #{record.commenttime,jdbcType=VARCHAR},
+      </if>
+      <if test="record.replyperson != null">
+        replyPerson = #{record.replyperson,jdbcType=VARCHAR},
+      </if>
+      <if test="record.reply != null">
+        reply = #{record.reply,jdbcType=VARCHAR},
+      </if>
+      <if test="record.replytime != null">
+        replyTime = #{record.replytime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update tb_comment
+    set id = #{record.id,jdbcType=INTEGER},
+      a_id = #{record.aId,jdbcType=INTEGER},
+      name = #{record.name,jdbcType=VARCHAR},
+      comment = #{record.comment,jdbcType=VARCHAR},
+      commentTime = #{record.commenttime,jdbcType=VARCHAR},
+      replyPerson = #{record.replyperson,jdbcType=VARCHAR},
+      reply = #{record.reply,jdbcType=VARCHAR},
+      replyTime = #{record.replytime,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.ssm.crud.bean.Comment">
+    update tb_comment
+    <set>
+      <if test="aId != null">
+        a_id = #{aId,jdbcType=INTEGER},
+      </if>
+      <if test="name != null">
+        name = #{name,jdbcType=VARCHAR},
+      </if>
+      <if test="comment != null">
+        comment = #{comment,jdbcType=VARCHAR},
+      </if>
+      <if test="commenttime != null">
+        commentTime = #{commenttime,jdbcType=VARCHAR},
+      </if>
+      <if test="replyperson != null">
+        replyPerson = #{replyperson,jdbcType=VARCHAR},
+      </if>
+      <if test="reply != null">
+        reply = #{reply,jdbcType=VARCHAR},
+      </if>
+      <if test="replytime != null">
+        replyTime = #{replytime,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.ssm.crud.bean.Comment">
+    update tb_comment
+    set a_id = #{aId,jdbcType=INTEGER},
+      name = #{name,jdbcType=VARCHAR},
+      comment = #{comment,jdbcType=VARCHAR},
+      commentTime = #{commenttime,jdbcType=VARCHAR},
+      replyPerson = #{replyperson,jdbcType=VARCHAR},
+      reply = #{reply,jdbcType=VARCHAR},
+      replyTime = #{replytime,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
